@@ -16,9 +16,9 @@ function DownChevrons() {
       height="30"
       viewBox="0 0 32 32"
       fill="none"
-      stroke-width="4"
-      stroke-linecap="round"
-      stroke-linejoin="round"
+      strokeWidth="4"
+      strokeLinecap="round"
+      strokeLinejoin="round"
       aria-hidden
       className="shrink-0"
     >
