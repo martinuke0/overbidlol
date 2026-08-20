@@ -1,0 +1,79 @@
+<!doctype html><html><head><meta charset="utf-8">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box;font-family:'DM Sans',sans-serif}
+  body{margin:0;background:#eceae6;color:#1a1a1a;padding:32px}
+  h2{font-size:14px;letter-spacing:.08em;text-transform:uppercase;color:#8a857e;margin:32px 0 14px}
+  .grid{display:grid;gap:16px}
+  .logos{grid-template-columns:repeat(4,1fr)}
+  .themes{grid-template-columns:repeat(2,1fr)}
+  .copies{grid-template-columns:repeat(3,1fr)}
+  .tile{background:#fff;border:1px solid #e3ded7;border-radius:16px;padding:20px}
+  .tag{font-size:11px;font-weight:700;color:#a29b91;letter-spacing:.06em;margin-bottom:12px}
+  .logo-row{display:flex;align-items:center;gap:10px;font-size:24px;font-weight:600;letter-spacing:-.04em;color:#282624}
+  .pill{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:5px 11px;font-size:12px}
+  .dot{width:7px;height:7px;border-radius:999px}
+  .claim{font-size:26px;font-weight:800;letter-spacing:-.03em;margin:14px 0 4px}
+  .row{display:flex;align-items:center;gap:10px;border-radius:14px;padding:10px 12px;margin-top:8px}
+  .rank{border-radius:9px;padding:3px 9px;font-size:12px;font-weight:800}
+  .name{font-weight:700;font-size:14px}
+  .price{margin-left:auto;font-weight:800}
+  .copyblock p{margin:0 0 10px;line-height:1.5}
+  .ct{font-size:12px;font-weight:700;color:#a29b91;margin-bottom:8px}
+</style></head><body>
+<div id="app"></div>
+<script>
+const ink='#282624';
+const logos={
+  bars:(a)=>`<svg width="34" height="34" viewBox="0 0 32 32"><rect x="4" y="18" width="6" height="10" rx="2" fill="${ink}"/><rect x="13" y="11" width="6" height="17" rx="2" fill="${ink}"/><rect x="22" y="5" width="6" height="23" rx="2" fill="${a}"/></svg>`,
+  chevron:(a)=>`<svg width="34" height="34" viewBox="0 0 32 32" fill="none" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 18 L16 10 L26 18" stroke="${a}"/><path d="M6 25 L16 17 L26 25" stroke="${ink}"/></svg>`,
+  crown:(a)=>`<svg width="34" height="34" viewBox="0 0 32 32"><path d="M4 23 L6 10 L13 16 L16 7 L19 16 L26 10 L28 23 Z" fill="${a}"/><rect x="4" y="23" width="24" height="4" rx="1.5" fill="${ink}"/></svg>`,
+  none:()=>``,
+};
+const themes=[
+ {name:'Warm terracotta (current)',bg:'#fffdfa',text:'#282624',sub:'#67625d',accent:'#e57255',at:'#fff',live:'#009f31',card:'#fffdfa',border:'#e6e0da',rowbg:'rgba(229,114,85,.05)'},
+ {name:'Midnight neon',bg:'#0e0f13',text:'#e8eaed',sub:'#9aa0a8',accent:'#b6ff3a',at:'#0e0f13',live:'#00e0a4',card:'#16181d',border:'#23262d',rowbg:'rgba(182,255,58,.07)'},
+ {name:'Electric blue',bg:'#f7f9fc',text:'#0f172a',sub:'#64748b',accent:'#2563eb',at:'#fff',live:'#16a34a',card:'#ffffff',border:'#e2e8f0',rowbg:'rgba(37,99,235,.05)'},
+ {name:'Royal violet',bg:'#faf9ff',text:'#1e1b2e',sub:'#6b6580',accent:'#7c3aed',at:'#fff',live:'#10b981',card:'#ffffff',border:'#ece9f5',rowbg:'rgba(124,58,237,.05)'},
+ {name:'Mono ink + acid',bg:'#ffffff',text:'#111111',sub:'#6b7280',accent:'#111111',at:'#fff',live:'#ff5c00',card:'#ffffff',border:'#e5e7eb',rowbg:'rgba(0,0,0,.03)'},
+];
+const copies=[
+ {t:'Punchy / degen',tag:'Rank is for sale. overbid everyone, take #1, and get seen when this board goes viral.',claim:'Grab #1 for',help:'Your bid is your rank. Bid under #1 and you still land on the board — wherever the money puts you.'},
+ {t:'Clean / professional',tag:'A public leaderboard ranked purely by bid. Pay to climb — #1 gets the spotlight when this site goes viral.',claim:'Claim #1 for',help:'The amount you pay sets your rank. Even below the top bid, you take whatever place your bid can buy.'},
+ {t:'Fresh reword (same meaning)',tag:'No ads. No API keys. No revenue share. Just overbid the competition and rise to the top — will you hold #1 when this blows up?',claim:'Take #1 for',help:'Your amount decides where you land. Pay less than #1 and you still get a spot — whatever rank that bid earns.'},
+];
+const logoLabels=[['A · Ascending bars','bars'],['B · Up-chevron stack','chevron'],['C · Crown','crown'],['D · Wordmark only','none']];
+
+let html='<h2>1 · Logo marks (shown in current terracotta)</h2><div class="grid logos">';
+for(const [label,key] of logoLabels){
+  html+=`<div class="tile"><div class="tag">${label}</div><div class="logo-row">${logos[key]('#e57255')}<span>overbid<span style="color:${key==='none'?'#e57255':'#282624'}">.lol</span></span></div></div>`;
+}
+html+='</div><h2>2 · Themes (mini mockup in each palette)</h2><div class="grid themes">';
+for(const t of themes){
+  html+=`<div class="tile" style="background:${t.bg};border-color:${t.border}">
+    <div class="tag" style="color:${t.sub}">${t.name}</div>
+    <div class="logo-row" style="color:${t.text}">${logos.bars(t.accent)}<span>overbid<span style="color:${t.text}">.lol</span></span></div>
+    <div style="margin-top:10px"><span class="pill" style="background:${t.rowbg};color:${t.sub}"><span class="dot" style="background:${t.live}"></span><b style="color:${t.live}">382</b> online · 44k today</span></div>
+    <div class="claim" style="color:${t.text}">Claim #1 for <span style="color:${t.accent}">$1023</span></div>
+    <div class="row" style="background:${t.rowbg};border:1px solid ${t.border}">
+      <span class="rank" style="background:${t.accent};color:${t.at}">#1</span>
+      <span class="name" style="color:${t.text}">trycodus.com</span>
+      <span class="price" style="color:${t.accent}">$1,020</span>
+    </div>
+    <div class="row" style="background:${t.rowbg};border:1px solid ${t.border}">
+      <span class="rank" style="background:${t.accent};color:${t.at}">#2</span>
+      <span class="name" style="color:${t.text}">ranked.ai</span>
+      <span class="price" style="color:${t.accent}">$1,019</span>
+    </div>
+  </div>`;
+}
+html+='</div><h2>3 · Copy variants</h2><div class="grid copies">';
+for(const c of copies){
+  html+=`<div class="tile copyblock"><div class="ct">${c.t}</div>
+   <p style="color:#67625d">${c.tag}</p>
+   <p style="font-weight:800;font-size:20px;color:#282624">${c.claim} <span style="color:#e57255">$1023</span></p>
+   <p style="font-size:13px;color:#8a857e">${c.help}</p></div>`;
+}
+html+='</div>';
+document.getElementById('app').innerHTML=html;
+</script></body></html>
