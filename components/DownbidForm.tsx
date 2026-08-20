@@ -21,8 +21,11 @@ const usd = (cents: number) => {
   return d % 1 === 0 ? `$${d}` : `$${d.toFixed(2)}`;
 };
 
-export function DownbidForm() {
-  const [amount, setAmount] = useState("10"); // dollars to lower them by
+export function DownbidForm({ defaultLowerCents }: { defaultLowerCents: number }) {
+  // Default to the current top bid — enough to knock #1 off the board.
+  const [amount, setAmount] = useState(() =>
+    fmt(Math.max(MIN_CENTS, Math.round(defaultLowerCents / STEP_CENTS) * STEP_CENTS)),
+  );
   const [target, setTarget] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);

@@ -34,17 +34,21 @@ export function BoardApp({
         <button
           type="button"
           onClick={() => setMode(down ? "overbid" : "downbid")}
-          className={`inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-bold transition-colors ${
+          className={`inline-flex items-center gap-2 rounded-full border border-transparent px-5 py-2 text-sm font-extrabold tracking-tight uppercase transition-transform hover:scale-105 ${
             down
-              ? "text-muted-foreground hover:text-foreground"
-              : "border-destructive/30 text-destructive hover:bg-destructive/10"
+              ? "bg-white text-black shadow-sm"
+              : "hater-btn bg-[#ff1f2e] text-white"
           }`}
         >
-          {down ? "← Back to overbid" : "😈 Haters!"}
+          {down ? "😇 Angels!" : "😈 Haters!"}
         </button>
       </div>
 
-      {down ? <DownbidForm /> : <BidForm defaultCents={defaultCents} bids={bids} />}
+      {down ? (
+        <DownbidForm defaultLowerCents={bids.length ? Math.max(...bids) : 100} />
+      ) : (
+        <BidForm defaultCents={defaultCents} bids={bids} />
+      )}
 
       <Board initial={initial} />
     </>
