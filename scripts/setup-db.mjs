@@ -20,8 +20,8 @@ await client.query(schema);
 await client.query(
   `insert into listings (identity_kind, identity_key, url, handle, title, description, bid_cents)
    values
-     ('url', 'https://overbid.lol', 'https://overbid.lol/?utm_source=overbid', null, 'overbid.lol',
-      'No ads, no API keys, no revenue sharing. Just overbid your competition to get to the top.', 100),
+     ('url', 'https://outbid.lol', 'https://outbid.lol/?utm_source=overbid', null, 'outbid.lol',
+      'No ads, no API keys, no revenue sharing. Just outbid your competition to get to the top.', 100),
      ('handle', '@elonmusk', 'https://x.com/elonmusk?utm_source=overbid', '@elonmusk', '', '', 200)
    on conflict (identity_key) do nothing`,
 );
