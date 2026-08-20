@@ -1,10 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 
-export default function Success() {
+function SuccessInner() {
   const checkoutId = useSearchParams().get("checkout_id");
   const [state, setState] = useState<{ status: string; rank?: number }>({ status: "pending" });
 
@@ -45,5 +45,13 @@ export default function Success() {
         Back to the board
       </Link>
     </main>
+  );
+}
+
+export default function Success() {
+  return (
+    <Suspense fallback={null}>
+      <SuccessInner />
+    </Suspense>
   );
 }

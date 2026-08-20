@@ -12,13 +12,7 @@ function GlobeIcon() {
   );
 }
 
-export function BidForm({
-  defaultDollars,
-  devMode,
-}: {
-  defaultDollars: number;
-  devMode: boolean;
-}) {
+export function BidForm({ defaultDollars }: { defaultDollars: number }) {
   const router = useRouter();
   const [dollars, setDollars] = useState(defaultDollars);
   const [target, setTarget] = useState("");
@@ -122,17 +116,6 @@ export function BidForm({
       </div>
 
       {error && <p className="mt-3 text-center text-sm font-medium text-destructive">{error}</p>}
-
-      {devMode && (
-        <button
-          type="button"
-          disabled={busy}
-          onClick={() => submit("/api/dev/simulate")}
-          className="mt-2 inline-flex w-full items-center justify-center rounded-full border px-6 py-2 text-sm font-semibold text-muted-foreground transition-colors hover:text-foreground disabled:opacity-60"
-        >
-          ⚡ Simulate paid bid (dev, no charge)
-        </button>
-      )}
 
       <p className="mt-3 text-center text-sm text-muted-foreground">
         Already on the list? Enter the same URL or @handle and up your bid to get back to the top.

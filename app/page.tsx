@@ -13,10 +13,7 @@ export default async function Home() {
   return (
     <main className="mx-auto w-full max-w-3xl grow px-4 py-10 sm:py-14">
       <Header />
-      <BidForm
-        defaultDollars={Math.max(1, nextToClaimDollars)}
-        devMode={process.env.NODE_ENV !== "production"}
-      />
+      <BidForm defaultDollars={Math.max(1, nextToClaimDollars)} />
       <Board initial={listings} />
       <footer className="mt-12 text-center text-xs text-muted-foreground">
         Rank is the bid. Bids are whole US dollars. A completed payment claims the rank.

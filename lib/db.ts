@@ -111,7 +111,13 @@ export async function registerClick(id: string): Promise<string | null> {
 export async function runApply(
   intentId: string,
   polarOrderId: string,
+  paidCents: number,
 ): Promise<void> {
+  // Money-true: apply what was ACTUALLY paid (Polar order net amount), not the
+  // intended pay_cents — so editing the amount on Polar's page can't buy free rank.
+  if (!Number.isInteger(paidCents) || paidCents <= 0) {
+    throw new Error(`invalid paidCents ${paidCents}`);
+  }
   const client = await pool.connect();
   try {
     await client.query("begin");
@@ -134,7 +140,7 @@ export async function runApply(
     await client.query(
       `insert into listings
          (identity_kind, identity_key, url, handle, title, description, bid_cents)
-       select identity_kind, identity_key, url, handle, title, description, pay_cents
+       select identity_kind, identity_key, url, handle, title, description, $2::int
        from checkout_intents where id = $1
        on conflict (identity_key) do update set
          bid_cents   = listings.bid_cents + excluded.bid_cents,
@@ -143,17 +149,17 @@ export async function runApply(
          url         = coalesce(excluded.url, listings.url),
          handle      = coalesce(excluded.handle, listings.handle),
          updated_at  = now()`,
-      [intentId],
+      [intentId, paidCents],
     );
 
     await client.query(
       `insert into bid_events (listing_id, intent_id, polar_order_id, delta_cents, bid_after_cents)
-       select l.id, i.id, $2, i.pay_cents, l.bid_cents
+       select l.id, i.id, $2, $3::int, l.bid_cents
        from checkout_intents i
        join listings l on l.identity_key = i.identity_key
        where i.id = $1
        on conflict (polar_order_id) do nothing`,
-      [intentId, polarOrderId],
+      [intentId, polarOrderId, paidCents],
     );
 
     await client.query(

@@ -20,7 +20,9 @@ export function LivePill() {
 
   return (
     <a
-      href="#board"
+      href="https://app.vemetric.com/public/overbid.lol"
+      target="_blank"
+      rel="noopener"
       className="inline-block max-w-full rounded-full bg-muted px-3 py-1.5 text-center text-sm text-balance text-muted-foreground transition-colors hover:text-foreground"
     >
       <span className="relative mr-2 inline-flex size-2 align-middle">

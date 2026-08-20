@@ -87,20 +87,12 @@ export async function createCheckout(opts: {
   const productId = process.env.POLAR_PRODUCT_ID!;
   const checkout = await polar.checkouts.create({
     products: [productId],
-    prices: {
-      [productId]: [
-        {
-          amountType: "fixed",
-          priceAmount: pay_cents,
-          priceCurrency: "usd",
-        },
-      ],
-    },
+    // Ad-hoc amount in cents. Requires the product to use a custom ("pay what you want") price.
+    amount: pay_cents,
     metadata: {
       intent_id: intent.id,
     },
     successUrl: `${process.env.NEXT_PUBLIC_APP_URL}/success?checkout_id={CHECKOUT_ID}`,
-    returnUrl: process.env.NEXT_PUBLIC_APP_URL,
     allowDiscountCodes: false,
     customerIpAddress: opts.clientIp,
   });
