@@ -14,7 +14,7 @@ export default async function Home() {
   return (
     <main className="mx-auto w-full max-w-3xl grow px-4 py-10 sm:py-14">
       <Header />
-      <BidForm defaultCents={defaultCents} />
+      <BidForm defaultCents={defaultCents} bids={listings.map((l) => l.bid_cents)} />
       <Board initial={listings} />
       <footer className="mt-12 text-center text-xs text-muted-foreground">
         Rank is the bid. Bids are in US dollars, $0.25 at a time. A completed payment claims the rank.

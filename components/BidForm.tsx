@@ -19,7 +19,7 @@ function GlobeIcon() {
   );
 }
 
-export function BidForm({ defaultCents }: { defaultCents: number }) {
+export function BidForm({ defaultCents, bids }: { defaultCents: number; bids: number[] }) {
   const router = useRouter();
   const [amount, setAmount] = useState(() => fmt(defaultCents)); // dollar string, e.g. "4" or "2.25"
   const [target, setTarget] = useState("");
@@ -30,6 +30,10 @@ export function BidForm({ defaultCents }: { defaultCents: number }) {
   // Snap to the nearest $0.25 step, floor at the $1 minimum.
   const snap = (cents: number) => Math.max(MIN_CENTS, Math.round(cents / STEP_CENTS) * STEP_CENTS);
   const bump = (dir: number) => setAmount(fmt(snap(snap(toCents(amount)) + dir * STEP_CENTS)));
+
+  // Which rank this amount would buy: a new bid ranks below every existing bid >= it.
+  const currentCents = snap(toCents(amount));
+  const rank = 1 + bids.filter((b) => b >= currentCents).length;
 
   // A URL if it looks like one, otherwise treat as an @handle.
   function splitInput() {
@@ -75,12 +79,13 @@ export function BidForm({ defaultCents }: { defaultCents: number }) {
   return (
     <div className="mx-auto w-full max-w-2xl">
       <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-center text-[32px] font-bold tracking-[-0.03em] md:text-[44px]">
-        <span>Grab #1 for</span>
+        <span>Grab #{rank} for</span>
         <span className="inline-flex items-center gap-2">
           <button type="button" aria-label="decrease" onClick={() => bump(-1)} className={stepBtn}>
             −
           </button>
-          <span className="inline-flex items-baseline text-primary">
+          {/* Fixed-width box, value centered → the +/- buttons never shift as digits change. */}
+          <span className="inline-flex w-[7ch] items-baseline justify-center text-primary">
             $
             <input
               inputMode="decimal"
@@ -88,7 +93,7 @@ export function BidForm({ defaultCents }: { defaultCents: number }) {
               value={amount}
               onChange={(e) => setAmount(e.target.value.replace(/[^\d.]/g, ""))}
               onBlur={() => setAmount(fmt(snap(toCents(amount))))}
-              className="min-w-0 bg-transparent p-0 text-center font-[inherit] text-[inherit] tracking-[inherit] tabular-nums text-primary outline-none"
+              className="min-w-0 bg-transparent p-0 text-left font-[inherit] text-[inherit] tracking-[inherit] tabular-nums text-primary outline-none"
               style={{ width: `${Math.max(1, amount.length)}ch` }}
             />
           </span>
