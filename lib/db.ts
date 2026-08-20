@@ -1,10 +1,14 @@
 import { Pool } from "pg";
 
 // ponytail: one global pool, reused across hot-reloads in dev.
+// Accept whichever name the host set — Vercel/Neon may expose POSTGRES_URL, not DATABASE_URL.
+const connectionString =
+  process.env.DATABASE_URL ||
+  process.env.POSTGRES_URL ||
+  process.env.DATABASE_URL_UNPOOLED ||
+  process.env.POSTGRES_URL_NON_POOLING;
 const g = globalThis as unknown as { _pool?: Pool };
-export const pool =
-  g._pool ??
-  (g._pool = new Pool({ connectionString: process.env.DATABASE_URL }));
+export const pool = g._pool ?? (g._pool = new Pool({ connectionString }));
 
 export type BoardRow = {
   rank: number;
