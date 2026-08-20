@@ -131,14 +131,14 @@
 @keyframes hater-pulse {
   0%,
   100% {
-    box-shadow: 0 0 0 0 rgba(255, 31, 46, 0.5);
+    box-shadow: 0 0 5px 0 rgba(255, 31, 46, 0.2);
   }
   50% {
-    box-shadow: 0 0 22px 5px rgba(255, 31, 46, 0.85);
+    box-shadow: 0 0 11px 1px rgba(255, 31, 46, 0.4);
   }
 }
 .hater-btn {
-  animation: hater-pulse 1.3s ease-in-out infinite;
+  animation: hater-pulse 2.6s ease-in-out infinite;
 }
 @media (prefers-reduced-motion: reduce) {
   .hater-btn {
