@@ -54,11 +54,13 @@ export async function insertIntent(row: {
   description: string;
   target_bid_cents: number;
   pay_cents: number;
+  action?: "overbid" | "downbid";
+  lower_cents?: number | null;
 }): Promise<{ id: string }> {
   const { rows } = await pool.query<{ id: string }>(
     `insert into checkout_intents
-       (listing_id, identity_kind, identity_key, url, handle, title, description, target_bid_cents, pay_cents)
-     values ($1,$2,$3,$4,$5,$6,$7,$8,$9)
+       (listing_id, identity_kind, identity_key, url, handle, title, description, target_bid_cents, pay_cents, action, lower_cents)
+     values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)
      returning id`,
     [
       row.listing_id,
@@ -70,6 +72,8 @@ export async function insertIntent(row: {
       row.description,
       row.target_bid_cents,
       row.pay_cents,
+      row.action ?? "overbid",
+      row.lower_cents ?? null,
     ],
   );
   return rows[0];
@@ -155,6 +159,39 @@ export async function runApply(
     }
     // Already applied or not payable → no-op (absorbs webhook retries).
     if (intent.polar_order_id === polarOrderId || intent.status !== "pending") {
+      await client.query("commit");
+      return;
+    }
+
+    if (intent.action === "downbid") {
+      // Subtract the reduction from the target. If it hits $0 or below, delist them.
+      const key = intent.identity_key;
+      const lower = intent.lower_cents ?? 0;
+      const { rows: tgt } = await client.query<{ id: string; bid_cents: number }>(
+        `select id, bid_cents from listings where identity_key = $1 for update`,
+        [key],
+      );
+      if (tgt[0]) {
+        const next = tgt[0].bid_cents - lower;
+        if (next <= 0) {
+          // schema forbids bid_cents <= 0 → remove the listing (children first).
+          await client.query(`delete from bid_events where listing_id = $1`, [tgt[0].id]);
+          await client.query(`delete from clicks where listing_id = $1`, [tgt[0].id]);
+          await client.query(`update checkout_intents set listing_id = null where listing_id = $1`, [tgt[0].id]);
+          await client.query(`delete from listings where id = $1`, [tgt[0].id]);
+        } else {
+          await client.query(
+            `update listings set bid_cents = $2, updated_at = now() where id = $1`,
+            [tgt[0].id, next],
+          );
+        }
+      }
+      // Idempotency for downbids rides on the intent status guard below.
+      await client.query(
+        `update checkout_intents set status = 'paid', polar_order_id = $2, paid_at = now()
+         where id = $1 and status = 'pending'`,
+        [intentId, polarOrderId],
+      );
       await client.query("commit");
       return;
     }

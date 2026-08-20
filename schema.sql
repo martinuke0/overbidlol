@@ -33,6 +33,8 @@ create table checkout_intents (
   description       text not null default '',
   target_bid_cents  integer not null check (target_bid_cents >= 100),
   pay_cents         integer not null check (pay_cents >= 25),
+  action            text not null default 'overbid' check (action in ('overbid', 'downbid')),
+  lower_cents       integer, -- downbid only: how much to subtract from the target
   polar_checkout_id text unique,
   polar_order_id    text unique,
   status            text not null default 'pending'

@@ -28,3 +28,13 @@ export function computePayCents(
 export function toTakeRankCents(rowBidCents: number): number {
   return rowBidCents + STEP_CENTS;
 }
+
+export const HATER_TAX = 0.25; // 25% surcharge to downbid someone
+
+/** What a hater pays to lower a target by `lowerCents` (reduction + 25% tax). */
+export function downbidPayCents(lowerCents: number): number {
+  if (!Number.isInteger(lowerCents) || lowerCents < MIN_CENTS) {
+    throw new Error("Minimum downbid is $1");
+  }
+  return Math.round(lowerCents * (1 + HATER_TAX));
+}

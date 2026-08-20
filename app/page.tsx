@@ -1,6 +1,4 @@
-import { Header } from "@/components/Header";
-import { BidForm } from "@/components/BidForm";
-import { Board } from "@/components/Board";
+import { BoardApp } from "@/components/BoardApp";
 import { getBoard } from "@/lib/db";
 import { MIN_CENTS, STEP_CENTS } from "@/lib/bid";
 
@@ -13,9 +11,11 @@ export default async function Home() {
 
   return (
     <main className="mx-auto w-full max-w-3xl grow px-4 py-10 sm:py-14">
-      <Header />
-      <BidForm defaultCents={defaultCents} bids={listings.map((l) => l.bid_cents)} />
-      <Board initial={listings} />
+      <BoardApp
+        initial={listings}
+        defaultCents={defaultCents}
+        bids={listings.map((l) => l.bid_cents)}
+      />
       <footer className="mt-12 text-center text-xs text-muted-foreground">
         Rank is the bid. Bids are in US dollars, $0.25 at a time. A completed payment claims the rank.
         <div className="mt-2">

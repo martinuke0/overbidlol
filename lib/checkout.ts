@@ -1,6 +1,6 @@
 import { Polar } from "@polar-sh/sdk";
 import { parseIdentity } from "./identity";
-import { computePayCents, MIN_CENTS, STEP_CENTS } from "./bid";
+import { computePayCents, downbidPayCents, MIN_CENTS, STEP_CENTS } from "./bid";
 import { enrich } from "./og";
 import { findListingByKey, insertIntent, savePolarCheckoutId } from "./db";
 
@@ -26,18 +26,22 @@ export type CheckoutBody = {
   description?: string;
 };
 
-export async function createCheckout(opts: {
-  body: CheckoutBody;
-  clientIp: string | undefined;
-}): Promise<{ url: string }> {
-  // Redirect base must be TRUSTED config — never the request Origin (spoofable → open redirect).
-  // NEXT_PUBLIC_APP_URL, else Vercel's platform-set production URL. Fail closed otherwise.
+// Redirect base must be TRUSTED config — never the request Origin (spoofable → open redirect).
+function resolveAppUrl(): string {
   const appUrl =
     process.env.NEXT_PUBLIC_APP_URL ||
     (process.env.VERCEL_PROJECT_PRODUCTION_URL
       ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
       : undefined);
   if (!appUrl) throw new Error("App URL not configured (set NEXT_PUBLIC_APP_URL)");
+  return appUrl;
+}
+
+export async function createCheckout(opts: {
+  body: CheckoutBody;
+  clientIp: string | undefined;
+}): Promise<{ url: string }> {
+  const appUrl = resolveAppUrl();
 
   // Amount arrives in cents; snap to the $0.25 step and enforce the $1 minimum.
   const raw = opts.body.amount_cents;
@@ -77,6 +81,56 @@ export async function createCheckout(opts: {
     products: [productId],
     // Ad-hoc amount in cents. REQUIRES the Polar product to use a custom ("pay what you want")
     // price — with a fixed catalog price this is ignored and Polar bills the catalog amount.
+    amount: pay_cents,
+    metadata: { intent_id: intent.id },
+    successUrl: `${appUrl}/success?checkout_id={CHECKOUT_ID}`,
+    allowDiscountCodes: false,
+    customerIpAddress: opts.clientIp,
+  });
+
+  await savePolarCheckoutId(intent.id, checkout.id);
+  return { url: checkout.url };
+}
+
+/** Pay to LOWER a target's bid by `lower_cents`, at a 25% hater tax. */
+export async function createDownbid(opts: {
+  body: { url?: string; handle?: string; lower_cents: number };
+  clientIp: string | undefined;
+}): Promise<{ url: string }> {
+  const appUrl = resolveAppUrl();
+
+  const identity = parseIdentity({
+    url: opts.body.url,
+    handle: opts.body.handle,
+    utmSource: process.env.NEXT_PUBLIC_UTM_SOURCE ?? "overbid",
+  });
+
+  const target = await findListingByKey(identity.key);
+  if (!target) throw new Error("That URL or @handle isn't on the board");
+
+  const lower_cents = Math.max(
+    MIN_CENTS,
+    Math.round((opts.body.lower_cents || 0) / STEP_CENTS) * STEP_CENTS,
+  );
+  const pay_cents = downbidPayCents(lower_cents);
+
+  const intent = await insertIntent({
+    listing_id: target.id,
+    identity_kind: identity.kind,
+    identity_key: identity.key,
+    url: identity.url,
+    handle: identity.handle,
+    title: "",
+    description: "",
+    target_bid_cents: lower_cents, // satisfies the >=100 column; semantically the reduction
+    pay_cents,
+    action: "downbid",
+    lower_cents,
+  });
+
+  const productId = process.env.POLAR_PRODUCT_ID!;
+  const checkout = await polar().checkouts.create({
+    products: [productId],
     amount: pay_cents,
     metadata: { intent_id: intent.id },
     successUrl: `${appUrl}/success?checkout_id={CHECKOUT_ID}`,
