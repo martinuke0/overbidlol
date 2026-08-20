@@ -37,7 +37,7 @@ export default function Rules() {
       </p>
 
       <Section title="How ranking works">
-        <Li>Bids are whole US dollars — a $1 minimum, raised $1 at a time.</Li>
+        <Li>Bids are in US dollars — a $1 minimum, raised $0.25 at a time.</Li>
         <Li>Paying less than #1 still lists you, at whatever rank that bid can buy.</Li>
         <Li>Equal bids keep the order they were placed — the earlier bid ranks higher.</Li>
         <Li>

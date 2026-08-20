@@ -1,7 +1,12 @@
 import type { BoardRow } from "./db";
 
-export const usd = (cents: number) =>
-  `$${Math.round(cents / 100).toLocaleString("en-US")}`;
+export const usd = (cents: number) => {
+  const d = cents / 100;
+  // Whole dollars stay clean ($1,020); fractional show cents ($2.48).
+  return d % 1 === 0
+    ? `$${d.toLocaleString("en-US")}`
+    : `$${d.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+};
 
 /** "5 minutes ago", "3 hours ago", "2 days ago" — matches overbid.lol phrasing. */
 export function timeAgo(iso: string, now: number): string {

@@ -2,6 +2,13 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { MIN_CENTS, STEP_CENTS } from "@/lib/bid";
+
+// Format cents as a bare dollar string: 400→"4", 248→"2.48", 250→"2.50".
+const fmt = (cents: number) => {
+  const d = cents / 100;
+  return d % 1 === 0 ? String(d) : d.toFixed(2);
+};
 
 function GlobeIcon() {
   return (
@@ -12,14 +19,17 @@ function GlobeIcon() {
   );
 }
 
-export function BidForm({ defaultDollars }: { defaultDollars: number }) {
+export function BidForm({ defaultCents }: { defaultCents: number }) {
   const router = useRouter();
-  const [dollars, setDollars] = useState(defaultDollars);
+  const [amount, setAmount] = useState(() => fmt(defaultCents)); // dollar string, e.g. "4" or "2.25"
   const [target, setTarget] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
-  const bump = (d: number) => setDollars((n) => Math.max(1, n + d));
+  const toCents = (s: string) => Math.round((parseFloat(s) || 0) * 100);
+  // Snap to the nearest $0.25 step, floor at the $1 minimum.
+  const snap = (cents: number) => Math.max(MIN_CENTS, Math.round(cents / STEP_CENTS) * STEP_CENTS);
+  const bump = (dir: number) => setAmount(fmt(snap(snap(toCents(amount)) + dir * STEP_CENTS)));
 
   // A URL if it looks like one, otherwise treat as an @handle.
   function splitInput() {
@@ -37,10 +47,12 @@ export function BidForm({ defaultDollars }: { defaultDollars: number }) {
     setError(null);
     setBusy(true);
     try {
+      const cents = snap(toCents(amount));
+      setAmount(fmt(cents));
       const res = await fetch(endpoint, {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ ...splitInput(), amount_dollars: dollars }),
+        body: JSON.stringify({ ...splitInput(), amount_cents: cents }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? "Something went wrong");
@@ -71,14 +83,13 @@ export function BidForm({ defaultDollars }: { defaultDollars: number }) {
           <span className="inline-flex items-baseline text-primary">
             $
             <input
-              inputMode="numeric"
+              inputMode="decimal"
               aria-label="Amount in dollars"
-              value={dollars}
-              onChange={(e) =>
-                setDollars(Math.max(1, Math.floor(Number(e.target.value.replace(/\D/g, "")) || 1)))
-              }
+              value={amount}
+              onChange={(e) => setAmount(e.target.value.replace(/[^\d.]/g, ""))}
+              onBlur={() => setAmount(fmt(snap(toCents(amount))))}
               className="min-w-0 bg-transparent p-0 text-center font-[inherit] text-[inherit] tracking-[inherit] tabular-nums text-primary outline-none"
-              style={{ width: `${Math.max(1, String(dollars).length)}ch` }}
+              style={{ width: `${Math.max(1, amount.length)}ch` }}
             />
           </span>
           <button type="button" aria-label="increase" onClick={() => bump(1)} className={stepBtn}>

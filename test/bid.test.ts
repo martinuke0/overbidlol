@@ -29,8 +29,12 @@ test("a low bid on a rich board is still valid (fills the screenshot)", () => {
   assert.equal(computePayCents(4000, null), 4000);
 });
 
-test("claim-this-rank helper is one step up", () => {
-  assert.equal(toTakeRankCents(4000), 4100);
+test("claim-this-rank helper is one $0.25 step up", () => {
+  assert.equal(toTakeRankCents(4000), 4025);
+});
+
+test("upbid by one quarter pays 25 cents", () => {
+  assert.equal(computePayCents(225, 200), 25);
 });
 
 test("URL identity strips www, tracking params, trailing slash", () => {

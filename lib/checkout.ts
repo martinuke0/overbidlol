@@ -1,6 +1,6 @@
 import { Polar } from "@polar-sh/sdk";
 import { parseIdentity } from "./identity";
-import { computePayCents } from "./bid";
+import { computePayCents, MIN_CENTS, STEP_CENTS } from "./bid";
 import { enrich } from "./og";
 import { findListingByKey, insertIntent, savePolarCheckoutId } from "./db";
 
@@ -21,7 +21,7 @@ function polar(): Polar {
 export type CheckoutBody = {
   url?: string;
   handle?: string;
-  amount_dollars: number;
+  amount_cents: number;
   title?: string;
   description?: string;
 };
@@ -29,16 +29,20 @@ export type CheckoutBody = {
 export async function createCheckout(opts: {
   body: CheckoutBody;
   clientIp: string | undefined;
-  appUrl?: string;
 }): Promise<{ url: string }> {
-  // Prefer explicit config; fall back to the request origin so a missing env var
-  // can't produce "undefined/success?..." (which Polar rejects).
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL || opts.appUrl;
+  // Redirect base must be TRUSTED config — never the request Origin (spoofable → open redirect).
+  // NEXT_PUBLIC_APP_URL, else Vercel's platform-set production URL. Fail closed otherwise.
+  const appUrl =
+    process.env.NEXT_PUBLIC_APP_URL ||
+    (process.env.VERCEL_PROJECT_PRODUCTION_URL
+      ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
+      : undefined);
   if (!appUrl) throw new Error("App URL not configured (set NEXT_PUBLIC_APP_URL)");
-  const dollars = opts.body.amount_dollars;
-  if (!Number.isInteger(dollars) || dollars < 1) {
-    throw new Error("Amount must be a whole dollar >= 1");
-  }
+
+  // Amount arrives in cents; snap to the $0.25 step and enforce the $1 minimum.
+  const raw = opts.body.amount_cents;
+  if (!Number.isFinite(raw)) throw new Error("Amount is required");
+  const target_bid_cents = Math.max(MIN_CENTS, Math.round(raw / STEP_CENTS) * STEP_CENTS);
 
   const identity = parseIdentity({
     url: opts.body.url,
@@ -47,7 +51,6 @@ export async function createCheckout(opts: {
   });
 
   const existing = await findListingByKey(identity.key);
-  const target_bid_cents = dollars * 100;
   const pay_cents = computePayCents(target_bid_cents, existing?.bid_cents ?? null);
 
   const { title, description } = await enrich(

@@ -32,7 +32,7 @@ create table checkout_intents (
   title             text not null default '',
   description       text not null default '',
   target_bid_cents  integer not null check (target_bid_cents >= 100),
-  pay_cents         integer not null check (pay_cents >= 100),
+  pay_cents         integer not null check (pay_cents >= 25),
   polar_checkout_id text unique,
   polar_order_id    text unique,
   status            text not null default 'pending'
