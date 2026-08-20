@@ -48,7 +48,7 @@ export function LivePill() {
 
   return (
     <a
-      href="https://app.vemetric.com/public/overbid.lol"
+      href={process.env.NEXT_PUBLIC_STATS_URL || "https://app.vemetric.com/public/overbid.lol"}
       target="_blank"
       rel="noopener"
       className="inline-block max-w-full rounded-full bg-muted px-3 py-1.5 text-center text-sm text-balance text-muted-foreground transition-colors hover:text-foreground"
