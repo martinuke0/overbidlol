@@ -29,7 +29,12 @@ export type CheckoutBody = {
 export async function createCheckout(opts: {
   body: CheckoutBody;
   clientIp: string | undefined;
+  appUrl?: string;
 }): Promise<{ url: string }> {
+  // Prefer explicit config; fall back to the request origin so a missing env var
+  // can't produce "undefined/success?..." (which Polar rejects).
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || opts.appUrl;
+  if (!appUrl) throw new Error("App URL not configured (set NEXT_PUBLIC_APP_URL)");
   const dollars = opts.body.amount_dollars;
   if (!Number.isInteger(dollars) || dollars < 1) {
     throw new Error("Amount must be a whole dollar >= 1");
@@ -71,7 +76,7 @@ export async function createCheckout(opts: {
     // price — with a fixed catalog price this is ignored and Polar bills the catalog amount.
     amount: pay_cents,
     metadata: { intent_id: intent.id },
-    successUrl: `${process.env.NEXT_PUBLIC_APP_URL}/success?checkout_id={CHECKOUT_ID}`,
+    successUrl: `${appUrl}/success?checkout_id={CHECKOUT_ID}`,
     allowDiscountCodes: false,
     customerIpAddress: opts.clientIp,
   });

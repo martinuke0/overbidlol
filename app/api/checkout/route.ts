@@ -5,7 +5,8 @@ export async function POST(req: Request) {
   try {
     const body = await req.json();
     const clientIp = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim();
-    const { url } = await createCheckout({ body, clientIp });
+    const appUrl = req.headers.get("origin") ?? undefined;
+    const { url } = await createCheckout({ body, clientIp, appUrl });
     return NextResponse.json({ url });
   } catch (e) {
     const message = e instanceof Error ? e.message : "Checkout failed";
