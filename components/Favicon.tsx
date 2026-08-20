@@ -7,5 +7,5 @@ export function Favicon({ src, letter }: { src: string | null; letter: string })
   const [err, setErr] = useState(false);
   if (!src || err) return <>{letter}</>;
   // eslint-disable-next-line @next/next/no-img-element
-  return <img src={src} alt="" className="size-6" onError={() => setErr(true)} />;
+  return <img src={src} alt="" className="size-7" onError={() => setErr(true)} />;
 }

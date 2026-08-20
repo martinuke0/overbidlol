@@ -22,6 +22,7 @@ export default async function Home() {
             Rules
           </a>
         </div>
+        <div className="mt-4">© 2026. All rights reserved.</div>
       </footer>
     </main>
   );

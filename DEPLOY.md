@@ -54,5 +54,6 @@ DATABASE_URL="<prod url>" node scripts/setup-db.mjs
 
 ## 5. Notes
 
-- `app/api/dev/simulate` is already disabled when `NODE_ENV=production` — safe to leave, or delete it.
+- The dev-only "Simulate paid bid" route has been removed — all payments go through real Polar.
+- The Polar **product must use a custom ("pay what you want") price** or the checkout `amount` is ignored and it bills the catalog price.
 - ngrok is only for local webhook testing; drop it once deployed.

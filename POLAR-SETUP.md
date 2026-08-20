@@ -1,7 +1,8 @@
 # Polar sandbox setup (take real test money locally)
 
-The app runs and the board works **without Polar** (use the dev "Simulate paid bid"
-button). Do this only when you want the real **overbid** button to open a Polar checkout.
+The board renders **without Polar** (browse-only). Configure Polar when you want the
+**Overbid** button to open a real checkout. Use a **sandbox** org for free test payments;
+switch to a production org only for real money.
 
 ## 1. Expose localhost so Polar can reach your webhook
 

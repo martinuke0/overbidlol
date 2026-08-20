@@ -61,6 +61,15 @@ create table clicks (
 
 create index clicks_listing_idx on clicks (listing_id, created_at desc);
 
+-- Real visitor stats for the live pill. Client heartbeats every ~30s.
+create table visits (
+  id         bigserial primary key,
+  visitor    text not null,
+  created_at timestamptz not null default now()
+);
+
+create index visits_created_idx on visits (created_at desc);
+
 -- Ranked board
 create or replace view board as
 select

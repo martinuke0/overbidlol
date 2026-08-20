@@ -50,7 +50,7 @@ export function Board({ initial }: { initial: Row[] }) {
           Refresh
         </button>
       </div>
-      <ol className="space-y-2">
+      <ol className="space-y-3 pt-1">
         {rows.map((row) => (
           <BoardRow key={row.id} row={row} now={now} />
         ))}

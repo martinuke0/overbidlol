@@ -81,6 +81,24 @@ export async function savePolarCheckoutId(
   );
 }
 
+/** Record a heartbeat for a visitor (dedup happens in the count via distinct). */
+export async function recordVisit(visitor: string): Promise<void> {
+  await pool.query(`insert into visits (visitor) values ($1)`, [visitor.slice(0, 64)]);
+}
+
+/** Real live stats: distinct visitors in the last 5 min (online) and 24h. */
+export async function getStats(): Promise<{ online: number; day: number }> {
+  // ponytail: prune >24h rows here so the table stays bounded (polled every ~15s).
+  await pool.query(`delete from visits where created_at < now() - interval '24 hours'`);
+  const { rows } = await pool.query<{ online: string; day: string }>(
+    `select
+       count(distinct visitor) filter (where created_at > now() - interval '5 minutes') as online,
+       count(distinct visitor) as day
+     from visits`,
+  );
+  return { online: Number(rows[0]?.online ?? 0), day: Number(rows[0]?.day ?? 0) };
+}
+
 /** Success-page poll: intent status + resulting rank (if paid). */
 export async function getIntentByCheckoutId(checkoutId: string) {
   const { rows } = await pool.query(

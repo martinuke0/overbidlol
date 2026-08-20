@@ -2,20 +2,48 @@
 
 import { useEffect, useState } from "react";
 
-// ponytail: visitor counts are theater, matching overbid.lol's live pill. Client-side
-// jitter around a seed — swap for a real analytics count when you have one.
+// Real stats: heartbeat a visitor id every 30s, poll distinct-visitor counts every 15s.
+function visitorId(): string {
+  try {
+    let id = localStorage.getItem("ov_vid");
+    if (!id) {
+      id = crypto.randomUUID();
+      localStorage.setItem("ov_vid", id);
+    }
+    return id;
+  } catch {
+    return "anon";
+  }
+}
+
 export function LivePill() {
-  const [online, setOnline] = useState(0);
-  const [day, setDay] = useState(0);
+  const [online, setOnline] = useState<number | null>(null);
+  const [day, setDay] = useState<number | null>(null);
 
   useEffect(() => {
-    const base = 350 + Math.floor(Math.random() * 200);
-    setOnline(base);
-    setDay(40000 + Math.floor(Math.random() * 6000));
-    const t = setInterval(() => {
-      setOnline((n) => Math.max(1, n + Math.floor(Math.random() * 15) - 7));
-    }, 3000);
-    return () => clearInterval(t);
+    const vid = visitorId();
+    const beat = () =>
+      fetch("/api/visit", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ visitor: vid }),
+      }).catch(() => {});
+    const load = () =>
+      fetch("/api/stats", { cache: "no-store" })
+        .then((r) => r.json())
+        .then((d) => {
+          setOnline(d.online);
+          setDay(d.day);
+        })
+        .catch(() => {});
+    beat();
+    load();
+    const b = setInterval(beat, 30000);
+    const l = setInterval(load, 15000);
+    return () => {
+      clearInterval(b);
+      clearInterval(l);
+    };
   }, []);
 
   return (
@@ -29,9 +57,9 @@ export function LivePill() {
         <span className="absolute inline-flex size-full animate-ping rounded-full bg-live opacity-75 motion-reduce:animate-none" />
         <span className="relative inline-flex size-2 rounded-full bg-live" />
       </span>
-      <span className="font-semibold text-live">{online.toLocaleString()}</span> visitors
-      online · <span className="text-foreground">{day.toLocaleString()}</span> in the last 24
-      hours · see stats→
+      <span className="font-semibold text-live">{(online ?? 0).toLocaleString()}</span> visitors
+      online · <span className="text-foreground">{(day ?? 0).toLocaleString()}</span> in the last
+      24 hours · see stats→
     </a>
   );
 }
