@@ -3,11 +3,11 @@ import { usd, timeAgo, displayName, faviconUrl } from "@/lib/format";
 import { toTakeRankCents } from "@/lib/bid";
 import { Favicon } from "./Favicon";
 
-export function BoardRow({ row, now }: { row: Row; now: number | null }) {
+export function BoardRow({ row, now, rank }: { row: Row; now: number | null; rank: number }) {
   const name = displayName(row);
   const favicon = faviconUrl(row);
   const letter = name.replace(/^@/, "").charAt(0).toUpperCase() || "?";
-  const isTop = Number(row.rank) === 1;
+  const isTop = rank === 1;
 
   return (
     <li className="relative">
@@ -28,7 +28,7 @@ export function BoardRow({ row, now }: { row: Row; now: number | null }) {
         </span>
 
         <span className="inline-flex shrink-0 items-center justify-center rounded-lg bg-foreground px-3 py-1.5 text-sm font-bold tabular-nums text-background">
-          #{row.rank}
+          #{rank}
         </span>
 
         <span className="flex size-12 shrink-0 items-center justify-center overflow-hidden rounded-xl border bg-card text-base font-bold text-muted-foreground">
