@@ -309,8 +309,12 @@ export async function runApply(
 
     const { rows: upserted } = await client.query<{ bid_cents: number }>(
       `insert into listings
-         (identity_kind, identity_key, url, handle, title, description, bid_cents)
-       select identity_kind, identity_key, url, handle, title, description, $2::int
+         (identity_kind, identity_key, url, handle, title, description, favicon_url, bid_cents)
+       select identity_kind, identity_key, url, handle, title, description,
+              case when identity_kind = 'handle'
+                   then 'https://unavatar.io/x/' || ltrim(handle, '@') || '?fallback=false'
+                   else null end,
+              $2::int
        from checkout_intents where id = $1
        on conflict (identity_key) do update set
          bid_cents   = listings.bid_cents + excluded.bid_cents,
@@ -318,6 +322,7 @@ export async function runApply(
          description = case when excluded.description = '' then listings.description else excluded.description end,
          url         = coalesce(excluded.url, listings.url),
          handle      = coalesce(excluded.handle, listings.handle),
+         favicon_url = coalesce(listings.favicon_url, excluded.favicon_url),
          updated_at  = now()
        returning bid_cents`,
       [intentId, paidCents],

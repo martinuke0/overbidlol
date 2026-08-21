@@ -15,15 +15,16 @@ const description = rest.join(" ");
 
 await withClient(async (c) => {
   await c.query(
-    `insert into listings (identity_kind, identity_key, url, handle, title, description, bid_cents)
-     values ($1,$2,$3,$4,$5,$6,$7)
+    `insert into listings (identity_kind, identity_key, url, handle, title, description, favicon_url, bid_cents)
+     values ($1,$2,$3,$4,$5,$6,$7,$8)
      on conflict (identity_key) do update set
        bid_cents = excluded.bid_cents,
        description = excluded.description,
        url = excluded.url,
        handle = excluded.handle,
+       favicon_url = coalesce(listings.favicon_url, excluded.favicon_url),
        updated_at = now()`,
-    [id.kind, id.key, id.url, id.handle, id.title, description, bid],
+    [id.kind, id.key, id.url, id.handle, id.title, description, id.favicon, bid],
   );
   console.log(`✓ ${id.key} → $${(bid / 100).toFixed(2)}${description ? ` · "${description}"` : ""}`);
   await showBoard(c);

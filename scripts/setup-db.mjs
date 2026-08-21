@@ -67,6 +67,13 @@ for (let i = 0; i < haterOrder.length; i++) {
   );
 }
 
+// Auto-fill X avatars for any handle without a custom one (keeps @martinuke0's uploaded pic).
+await client.query(
+  `update listings
+     set favicon_url = 'https://unavatar.io/x/' || ltrim(handle, '@') || '?fallback=false'
+   where identity_kind = 'handle' and favicon_url is null`,
+);
+
 // Seed a little launch history for the live feed.
 await client.query(
   `insert into activity (kind, label, amount_cents, note, created_at) values

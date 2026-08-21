@@ -37,6 +37,8 @@ export function normalize(input) {
       handle, // keep the given casing for display
       url: `https://x.com/${key.slice(1)}?utm_source=overbid`,
       title: "",
+      // Auto-resolve the X profile pic by handle (letter fallback if it 404s).
+      favicon: `https://unavatar.io/x/${key.slice(1)}?fallback=false`,
     };
   }
   let u;
@@ -57,7 +59,7 @@ export function normalize(input) {
   const search = u.searchParams.toString();
   const key = `https://${host}${path || ""}` + (search ? `?${search}` : "");
   const url = key + (key.includes("?") ? "&" : "?") + "utm_source=overbid";
-  return { kind: "url", key, handle: null, url, title: host };
+  return { kind: "url", key, handle: null, url, title: host, favicon: null };
 }
 
 export function toCents(dollars) {
