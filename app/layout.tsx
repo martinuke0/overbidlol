@@ -8,9 +8,10 @@ const dmSans = DM_Sans({
 });
 
 const DESC =
-  "Rank is for sale. Overbid everyone, take #1, anoverbidseen when this board goes viral. No ads, no API keys, no revenue share.";
+  "Rank is for sale. Overbid everyone, take #1, and get seen when this board goes viral. No ads, no API keys, no revenue share.";
 
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || "https://overbid.lol"),
   title: "overbid.lol",
   description: DESC,
   openGraph: {
@@ -18,7 +19,7 @@ export const metadata: Metadata = {
     description: DESC,
     type: "website",
   },
-  twitter: { card: "summary_large_image", description: DESC },
+  twitter: { card: "summary_large_image", title: "overbid.lol", description: DESC },
 };
 
 export default function RootLayout({
