@@ -51,7 +51,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={`${dmSans.variable} dark`}>
+    <html lang="en" className={dmSans.variable}>
       <body className="min-h-full flex flex-col font-sans">{children}</body>
     </html>
   );

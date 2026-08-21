@@ -22,7 +22,7 @@ export function BoardApp({
   initialMode?: "overbid" | "downbid";
   initialTarget?: string;
 }) {
-  const [mode, setMode] = useState<"overbid" | "downbid">(initialMode ?? "downbid");
+  const [mode, setMode] = useState<"overbid" | "downbid">(initialMode ?? "overbid");
   const [filter, setFilter] = useState<Filter>("handle");
 
   // Haters! flips the whole page to the dark theme by toggling `.dark` on <html>.

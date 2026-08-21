@@ -144,7 +144,8 @@ export function BidForm({
       {error && <p className="mt-3 text-center text-sm font-medium text-destructive">{error}</p>}
 
       <p className="mt-3 text-center text-sm text-muted-foreground">
-        Already on the list? Enter the same URL or @handle and up your bid to get back to the top.
+        <span className="font-semibold text-foreground">Pay the difference.</span> Same URL or
+        @handle — you only pay what it takes to climb back to #1.
       </p>
     </div>
   );
