@@ -16,7 +16,7 @@ export function BoardApp({
   defaultCents: number;
   bids: number[];
 }) {
-  const [mode, setMode] = useState<"overbid" | "downbid">("overbid");
+  const [mode, setMode] = useState<"overbid" | "downbid">("downbid");
 
   // Haters! flips the whole page to the dark theme by toggling `.dark` on <html>.
   useEffect(() => {
