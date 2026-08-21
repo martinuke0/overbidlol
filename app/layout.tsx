@@ -12,14 +12,36 @@ const DESC =
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || "https://overbid.lol"),
-  title: "overbid.lol",
+  title: {
+    default: "overbid.lol — the pay-to-rank leaderboard",
+    template: "%s · overbid.lol",
+  },
   description: DESC,
+  applicationName: "overbid.lol",
+  keywords: [
+    "overbid",
+    "pay to rank",
+    "leaderboard",
+    "auction",
+    "startup leaderboard",
+    "bid to rank",
+    "downbid",
+    "product ranking",
+  ],
+  alternates: { canonical: "/" },
+  robots: { index: true, follow: true },
   openGraph: {
-    title: "overbid.lol",
+    title: "overbid.lol — the pay-to-rank leaderboard",
     description: DESC,
+    url: "/",
+    siteName: "overbid.lol",
     type: "website",
   },
-  twitter: { card: "summary_large_image", title: "overbid.lol", description: DESC },
+  twitter: {
+    card: "summary_large_image",
+    title: "overbid.lol — the pay-to-rank leaderboard",
+    description: DESC,
+  },
   verification: { google: "Upstw_YLQyfe035QAJfiEBe4uPc4x27TeCw3hGOo5AM" },
 };
 

@@ -33,18 +33,22 @@ export default function OpengraphImage() {
         <div
           style={{
             display: "flex",
-            flexWrap: "wrap",
-            justifyContent: "center",
-            gap: "0 14px",
-            marginTop: 30,
-            fontSize: 42,
-            maxWidth: 940,
-            textAlign: "center",
+            flexDirection: "column",
+            alignItems: "center",
+            gap: 16,
+            marginTop: 34,
+            fontSize: 40,
             color: "#555555",
           }}
         >
-          <span style={{ color: "#ff5c00", fontWeight: 700 }}>Rank is for sale.</span>
-          <span>Overbid everyone, take #1.</span>
+          <div style={{ display: "flex", gap: 14 }}>
+            <span style={{ color: "#ff5c00", fontWeight: 700 }}>Rank is for sale.</span>
+            <span>Overbid everyone, take #1.</span>
+          </div>
+          <div style={{ display: "flex", gap: 14 }}>
+            <span style={{ color: "#888888" }}>…or</span>
+            <span style={{ color: "#e11d0f", fontWeight: 700 }}>drag a rival down.</span>
+          </div>
         </div>
       </div>
     ),

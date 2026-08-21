@@ -11,6 +11,10 @@ export default async function Home() {
 
   return (
     <main className="mx-auto w-full max-w-3xl grow px-4 py-10 sm:py-14">
+      <h1 className="sr-only">
+        overbid.lol — the pay-to-rank leaderboard where your bid is your rank. Overbid to take #1,
+        or downbid to drag a rival down.
+      </h1>
       <BoardApp
         initial={listings}
         defaultCents={defaultCents}
