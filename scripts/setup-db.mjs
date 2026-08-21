@@ -6,6 +6,7 @@ import { dirname, join } from "node:path";
 import pg from "pg";
 import { importHaters } from "./admin/haters.mjs";
 import { importHaters2 } from "./admin/haters2.mjs";
+import { applyLocalAvatars } from "./admin/avatars.mjs";
 
 const here = dirname(fileURLToPath(import.meta.url));
 const schema = await readFile(join(here, "..", "schema.sql"), "utf8");
@@ -80,6 +81,8 @@ await client.query(
 await importHaters(client);
 // haters2.md: outbid's paying customers — URLs batch + X handles batch, both $1.
 await importHaters2(client);
+// Swap in the local icons (public/avatars) for every handle that has one.
+await applyLocalAvatars(client);
 
 
 const { rows } = await client.query(`select rank, title, bid_cents from board order by rank`);
