@@ -4,6 +4,7 @@ import { readFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
 import pg from "pg";
+import { importHaters } from "./admin/haters.mjs";
 
 const here = dirname(fileURLToPath(import.meta.url));
 const schema = await readFile(join(here, "..", "schema.sql"), "utf8");
@@ -73,6 +74,9 @@ await client.query(
      set favicon_url = 'https://unavatar.io/x/' || ltrim(handle, '@') || '?fallback=false'
    where identity_kind = 'handle' and favicon_url is null`,
 );
+
+// The full hater roster (@haters.md) at $1 with avatars + per-account share tweets.
+await importHaters(client);
 
 
 const { rows } = await client.query(`select rank, title, bid_cents from board order by rank`);
