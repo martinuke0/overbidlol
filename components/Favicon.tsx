@@ -20,6 +20,8 @@ export function Favicon({
     <img
       src={src}
       alt=""
+      loading="lazy"
+      decoding="async"
       className={cover ? "size-full object-cover" : "size-7"}
       onError={() => setErr(true)}
     />
