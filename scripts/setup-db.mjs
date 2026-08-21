@@ -13,7 +13,7 @@ await client.connect();
 
 await client.query(`
   drop view if exists board cascade;
-  drop table if exists bid_events, clicks, visits, checkout_intents, listings cascade;
+  drop table if exists bid_events, clicks, checkout_intents, listings cascade;
 `);
 await client.query(schema);
 

@@ -64,13 +64,14 @@ create table clicks (
 create index clicks_listing_idx on clicks (listing_id, created_at desc);
 
 -- Real visitor stats for the live pill. Client heartbeats every ~30s.
-create table visits (
+-- `if not exists` so a board reseed never wipes accumulated visitor history.
+create table if not exists visits (
   id         bigserial primary key,
   visitor    text not null,
   created_at timestamptz not null default now()
 );
 
-create index visits_created_idx on visits (created_at desc);
+create index if not exists visits_created_idx on visits (created_at desc);
 
 -- Ranked board
 create or replace view board as

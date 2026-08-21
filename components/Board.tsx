@@ -6,14 +6,14 @@ import { BoardRow } from "./BoardRow";
 
 const TABS = [
   { key: "url", label: "URLs" },
-  { key: "all", label: "All" },
   { key: "handle", label: "X" },
+  { key: "all", label: "All" },
 ] as const;
 type Filter = (typeof TABS)[number]["key"];
 
 export function Board({ initial }: { initial: Row[] }) {
   const [rows, setRows] = useState(initial);
-  const [filter, setFilter] = useState<Filter>("all");
+  const [filter, setFilter] = useState<Filter>("handle");
   // null until mounted so SSR and first client render match (avoids time-drift hydration mismatch).
   const [now, setNow] = useState<number | null>(null);
   const [fetchedAt, setFetchedAt] = useState(() => Date.now());
