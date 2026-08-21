@@ -9,8 +9,16 @@ import { DownbidForm } from "./DownbidForm";
 import { Board, type Filter } from "./Board";
 import { ActivityFeed } from "./ActivityFeed";
 
-export function BoardApp({ initial }: { initial: BoardRow[] }) {
-  const [mode, setMode] = useState<"overbid" | "downbid">("downbid");
+export function BoardApp({
+  initial,
+  initialMode,
+  initialTarget,
+}: {
+  initial: BoardRow[];
+  initialMode?: "overbid" | "downbid";
+  initialTarget?: string;
+}) {
+  const [mode, setMode] = useState<"overbid" | "downbid">(initialMode ?? "downbid");
   const [filter, setFilter] = useState<Filter>("handle");
 
   // Haters! flips the whole page to the dark theme by toggling `.dark` on <html>.
@@ -46,9 +54,9 @@ export function BoardApp({ initial }: { initial: BoardRow[] }) {
       </div>
 
       {down ? (
-        <DownbidForm defaultLowerCents={downbidDefault} />
+        <DownbidForm defaultLowerCents={downbidDefault} initialTarget={initialTarget} />
       ) : (
-        <BidForm defaultCents={overbidDefault} bids={catBids} />
+        <BidForm defaultCents={overbidDefault} bids={catBids} initialTarget={initialTarget} />
       )}
 
       <Board initial={initial} filter={filter} onFilter={setFilter} />

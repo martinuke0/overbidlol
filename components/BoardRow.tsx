@@ -3,6 +3,7 @@ import { usd, timeAgo, displayName, faviconUrl } from "@/lib/format";
 import { toTakeRankCents } from "@/lib/bid";
 import { Favicon } from "./Favicon";
 import { EditBio } from "./EditBio";
+import { ShareButton } from "./ShareButton";
 
 export function BoardRow({ row, now, rank }: { row: Row; now: number | null; rank: number }) {
   const name = displayName(row);
@@ -57,9 +58,10 @@ export function BoardRow({ row, now, rank }: { row: Row; now: number | null; ran
               {row.click_count.toLocaleString()} clicks
             </span>
           </p>
-          {/* Above the stretched link so it's independently clickable. */}
-          <div className="relative z-10 mt-1">
+          {/* Above the stretched link so they're independently clickable. */}
+          <div className="relative z-10 mt-1 flex flex-wrap items-center gap-x-4 gap-y-1">
             <EditBio target={editTarget} />
+            <ShareButton id={row.id} name={name} rank={rank} />
           </div>
         </div>
 

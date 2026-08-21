@@ -19,12 +19,20 @@ function GlobeIcon() {
   );
 }
 
-export function BidForm({ defaultCents, bids }: { defaultCents: number; bids: number[] }) {
+export function BidForm({
+  defaultCents,
+  bids,
+  initialTarget,
+}: {
+  defaultCents: number;
+  bids: number[];
+  initialTarget?: string;
+}) {
   const router = useRouter();
   const [amount, setAmount] = useState(() => fmt(defaultCents)); // dollar string, e.g. "4" or "2.25"
   // Switching category (slider tab) resets the suggested #1 price for that category.
   useEffect(() => setAmount(fmt(defaultCents)), [defaultCents]);
-  const [target, setTarget] = useState("");
+  const [target, setTarget] = useState(initialTarget ?? "");
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 

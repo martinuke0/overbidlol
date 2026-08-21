@@ -34,6 +34,13 @@ export async function getBoard(limit = 100): Promise<BoardRow[]> {
   return rows;
 }
 
+export async function getListingById(id: string): Promise<BoardRow | null> {
+  // uuid guard so a bad slug doesn't throw at the driver
+  if (!/^[0-9a-f-]{36}$/i.test(id)) return null;
+  const { rows } = await pool.query<BoardRow>(`select * from board where id = $1`, [id]);
+  return rows[0] ?? null;
+}
+
 export async function findListingByKey(
   key: string,
 ): Promise<{ id: string; bid_cents: number } | null> {

@@ -21,13 +21,19 @@ const usd = (cents: number) => {
   return d % 1 === 0 ? `$${d}` : `$${d.toFixed(2)}`;
 };
 
-export function DownbidForm({ defaultLowerCents }: { defaultLowerCents: number }) {
+export function DownbidForm({
+  defaultLowerCents,
+  initialTarget,
+}: {
+  defaultLowerCents: number;
+  initialTarget?: string;
+}) {
   // Default to the current top bid — enough to knock #1 off the board.
   const snapInit = (c: number) => Math.max(MIN_CENTS, Math.round(c / STEP_CENTS) * STEP_CENTS);
   const [amount, setAmount] = useState(() => fmt(snapInit(defaultLowerCents)));
   // Switching category resets the default target reduction to that category's top bid.
   useEffect(() => setAmount(fmt(snapInit(defaultLowerCents))), [defaultLowerCents]);
-  const [target, setTarget] = useState("");
+  const [target, setTarget] = useState(initialTarget ?? "");
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 

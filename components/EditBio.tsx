@@ -56,7 +56,7 @@ export function EditBio({ target }: { target: string }) {
 
   return (
     <div
-      className="mt-1 rounded-lg border bg-card p-2"
+      className="mt-1 w-full rounded-lg border bg-card p-2"
       onClick={(e) => e.preventDefault()}
     >
       <textarea
