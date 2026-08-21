@@ -25,6 +25,7 @@ await client.query(
      ('handle', '@realdonaldtrump', 'https://x.com/realDonaldTrump?utm_source=overbid', '@realDonaldTrump', '', 'He is the president.', 975),
      ('handle', '@sama', 'https://x.com/sama?utm_source=overbid', '@sama', '', 'He is evil.', 950),
      ('handle', '@elonmusk', 'https://x.com/elonmusk?utm_source=overbid', '@elonmusk', '', 'He launches rockets.', 925),
+     ('handle', '@tibo_maker', 'https://x.com/tibo_maker?utm_source=overbid', '@tibo_maker', '', 'He spent 12k for nothing.', 900),
      ('url', 'https://grok.bot', 'https://grok.bot/?utm_source=overbid', null, 'grok.bot',
       'AI agents that run your site.', 125),
      ('url', 'https://outbid.lol', 'https://outbid.lol/?utm_source=overbid', null, 'outbid.lol',
