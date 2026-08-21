@@ -73,6 +73,18 @@ create table if not exists visits (
 
 create index if not exists visits_created_idx on visits (created_at desc);
 
+-- Live activity feed: one row per applied overbid/downbid.
+create table activity (
+  id           bigserial primary key,
+  kind         text not null check (kind in ('overbid', 'downbid')),
+  label        text not null,          -- affected listing, e.g. "@elonmusk"
+  amount_cents integer not null,       -- the delta (bid amount or reduction)
+  note         text not null default '',
+  created_at   timestamptz not null default now()
+);
+
+create index activity_created_idx on activity (created_at desc);
+
 -- Ranked board
 create or replace view board as
 select

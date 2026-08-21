@@ -6,6 +6,7 @@ import { Header } from "./Header";
 import { BidForm } from "./BidForm";
 import { DownbidForm } from "./DownbidForm";
 import { Board } from "./Board";
+import { ActivityFeed } from "./ActivityFeed";
 
 export function BoardApp({
   initial,
@@ -51,6 +52,7 @@ export function BoardApp({
       )}
 
       <Board initial={initial} />
+      <ActivityFeed />
     </>
   );
 }

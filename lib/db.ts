@@ -130,6 +130,40 @@ export async function registerClick(id: string): Promise<string | null> {
   return rows[0].url;
 }
 
+export type ActivityRow = {
+  id: string;
+  kind: "overbid" | "downbid";
+  label: string;
+  amount_cents: number;
+  note: string;
+  created_at: string;
+};
+
+/** Recent live-feed events, newest first. */
+export async function getActivity(limit = 25): Promise<ActivityRow[]> {
+  const { rows } = await pool.query<ActivityRow>(
+    `select id, kind, label, amount_cents, note, created_at
+     from activity order by created_at desc limit $1`,
+    [limit],
+  );
+  return rows;
+}
+
+const money = (c: number) => (c % 100 === 0 ? `$${c / 100}` : `$${(c / 100).toFixed(2)}`);
+function labelFor(r: {
+  identity_kind: string;
+  handle: string | null;
+  url: string | null;
+  identity_key: string;
+}): string {
+  if (r.identity_kind === "handle") return r.handle || r.identity_key;
+  try {
+    return new URL(r.url || r.identity_key).host.replace(/^www\./, "");
+  } catch {
+    return r.identity_key;
+  }
+}
+
 /**
  * The only write that matters. One transaction, idempotent on polar_order_id.
  * Mirrors snippets/apply-paid-order.sql: new row = pay_cents, upbid = +delta.
@@ -172,19 +206,27 @@ export async function runApply(
         [key],
       );
       if (tgt[0]) {
-        const next = tgt[0].bid_cents - lower;
+        const before = tgt[0].bid_cents;
+        const next = before - lower;
+        let note: string;
         if (next <= 0) {
           // schema forbids bid_cents <= 0 → remove the listing (children first).
           await client.query(`delete from bid_events where listing_id = $1`, [tgt[0].id]);
           await client.query(`delete from clicks where listing_id = $1`, [tgt[0].id]);
           await client.query(`update checkout_intents set listing_id = null where listing_id = $1`, [tgt[0].id]);
           await client.query(`delete from listings where id = $1`, [tgt[0].id]);
+          note = "knocked off the board";
         } else {
           await client.query(
             `update listings set bid_cents = $2, updated_at = now() where id = $1`,
             [tgt[0].id, next],
           );
+          note = `${money(before)} → ${money(next)}`;
         }
+        await client.query(
+          `insert into activity (kind, label, amount_cents, note) values ('downbid', $1, $2, $3)`,
+          [labelFor(intent), lower, note],
+        );
       }
       // Idempotency for downbids rides on the intent status guard below.
       await client.query(
@@ -196,7 +238,7 @@ export async function runApply(
       return;
     }
 
-    await client.query(
+    const { rows: upserted } = await client.query<{ bid_cents: number }>(
       `insert into listings
          (identity_kind, identity_key, url, handle, title, description, bid_cents)
        select identity_kind, identity_key, url, handle, title, description, $2::int
@@ -207,8 +249,14 @@ export async function runApply(
          description = case when excluded.description = '' then listings.description else excluded.description end,
          url         = coalesce(excluded.url, listings.url),
          handle      = coalesce(excluded.handle, listings.handle),
-         updated_at  = now()`,
+         updated_at  = now()
+       returning bid_cents`,
       [intentId, paidCents],
+    );
+
+    await client.query(
+      `insert into activity (kind, label, amount_cents, note) values ('overbid', $1, $2, $3)`,
+      [labelFor(intent), paidCents, `now ${money(upserted[0]?.bid_cents ?? paidCents)}`],
     );
 
     await client.query(
