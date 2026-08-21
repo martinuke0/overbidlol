@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import type { BoardRow } from "@/lib/db";
+import type { BoardPage } from "@/lib/db";
 import { MIN_CENTS, STEP_CENTS } from "@/lib/bid";
 import { Header } from "./Header";
 import { BidForm } from "./BidForm";
@@ -9,12 +9,16 @@ import { DownbidForm } from "./DownbidForm";
 import { Board, type Filter } from "./Board";
 import { ActivityFeed } from "./ActivityFeed";
 
+type Bid = { identity_kind: "url" | "handle"; bid_cents: number };
+
 export function BoardApp({
-  initial,
+  initialPage,
+  allBids,
   initialMode,
   initialTarget,
 }: {
-  initial: BoardRow[];
+  initialPage: BoardPage;
+  allBids: Bid[];
   initialMode?: "overbid" | "downbid";
   initialTarget?: string;
 }) {
@@ -30,7 +34,7 @@ export function BoardApp({
   const down = mode === "downbid";
 
   // The price to be #1 depends on the selected category (slider tab) — uncapped.
-  const catBids = initial
+  const catBids = allBids
     .filter((l) => filter === "all" || l.identity_kind === filter)
     .map((l) => l.bid_cents);
   const catTop = catBids.length ? Math.max(...catBids) : 0;
@@ -59,7 +63,7 @@ export function BoardApp({
         <BidForm defaultCents={overbidDefault} bids={catBids} initialTarget={initialTarget} />
       )}
 
-      <Board initial={initial} filter={filter} onFilter={setFilter} />
+      <Board initialPage={initialPage} filter={filter} onFilter={setFilter} />
       <ActivityFeed />
     </>
   );

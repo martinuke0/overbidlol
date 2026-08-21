@@ -34,6 +34,49 @@ export async function getBoard(limit = 100): Promise<BoardRow[]> {
   return rows;
 }
 
+export type BoardPage = {
+  listings: BoardRow[];
+  page: number;
+  pages: number;
+  total: number;
+};
+
+/** One page (25) of a category, ranked WITHIN that category. tab: all | url | handle. */
+export async function getBoardPage(opts: {
+  tab: string;
+  page: number;
+  pageSize?: number;
+}): Promise<BoardPage> {
+  const pageSize = opts.pageSize ?? 25;
+  const tab = opts.tab === "url" || opts.tab === "handle" ? opts.tab : "all";
+  const { rows: cnt } = await pool.query<{ n: number }>(
+    `select count(*)::int as n from listings where ($1 = 'all' or identity_kind = $1)`,
+    [tab],
+  );
+  const total = cnt[0]?.n ?? 0;
+  const pages = Math.max(1, Math.ceil(total / pageSize));
+  const page = Math.min(Math.max(1, opts.page || 1), pages);
+  const { rows } = await pool.query<BoardRow>(
+    `select * from (
+       select l.*, row_number() over (order by l.bid_cents desc, l.updated_at asc) as rank
+       from listings l
+       where ($1 = 'all' or l.identity_kind = $1)
+     ) t
+     order by t.rank
+     limit $2 offset $3`,
+    [tab, pageSize, (page - 1) * pageSize],
+  );
+  return { listings: rows, page, pages, total };
+}
+
+/** All bids (numbers only) — lightweight, feeds the form's category price + rank preview. */
+export async function getAllBids(): Promise<{ identity_kind: "url" | "handle"; bid_cents: number }[]> {
+  const { rows } = await pool.query<{ identity_kind: "url" | "handle"; bid_cents: number }>(
+    `select identity_kind, bid_cents from listings order by bid_cents desc`,
+  );
+  return rows;
+}
+
 export async function getListingById(id: string): Promise<BoardRow | null> {
   // uuid guard so a bad slug doesn't throw at the driver
   if (!/^[0-9a-f-]{36}$/i.test(id)) return null;
