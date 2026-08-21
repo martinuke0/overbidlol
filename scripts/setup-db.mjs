@@ -74,14 +74,6 @@ await client.query(
    where identity_kind = 'handle' and favicon_url is null`,
 );
 
-// Seed a little launch history for the live feed.
-await client.query(
-  `insert into activity (kind, label, amount_cents, note, created_at) values
-     ('downbid', '@elonmusk',        25,  '$9.50 → $9.25',  now() - interval '1 minute'),
-     ('overbid', '@jonathan_wilke',  1000,'took #1',        now() - interval '11 minutes'),
-     ('downbid', '@sama',            50,  '$10.00 → $9.50', now() - interval '26 minutes'),
-     ('overbid', '@realDonaldTrump', 975, 'joined the board', now() - interval '44 minutes')`,
-);
 
 const { rows } = await client.query(`select rank, title, bid_cents from board order by rank`);
 console.log("Board seeded:");
