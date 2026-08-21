@@ -20,6 +20,7 @@ export const metadata: Metadata = {
     type: "website",
   },
   twitter: { card: "summary_large_image", title: "overbid.lol", description: DESC },
+  verification: { google: "Upstw_YLQyfe035QAJfiEBe4uPc4x27TeCw3hGOo5AM" },
 };
 
 export default function RootLayout({
