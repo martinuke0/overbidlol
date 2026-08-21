@@ -19,7 +19,7 @@ export function ShareButton({
     const text =
       custom && custom.trim()
         ? custom
-        : `Should ${name} be #${rank} on overbid.lol? 😤\nOutbid them — or drag them down 👇`;
+        : `Hey ${name} — you're only #${rank} on overbid.lol 😤 Do something about it 👇`;
     const intent = `https://twitter.com/intent/tweet?text=${encodeURIComponent(
       text,
     )}&url=${encodeURIComponent(url)}`;
