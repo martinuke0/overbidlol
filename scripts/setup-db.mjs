@@ -24,9 +24,18 @@ await client.query(
      ('handle', '@realdonaldtrump', 'https://x.com/realDonaldTrump?utm_source=overbid', '@realDonaldTrump', '', 'He is the president.', 975),
      ('handle', '@sama', 'https://x.com/sama?utm_source=overbid', '@sama', '', 'He is evil.', 950),
      ('handle', '@elonmusk', 'https://x.com/elonmusk?utm_source=overbid', '@elonmusk', '', 'He launches rockets.', 925),
+     ('url', 'https://grok.bot', 'https://grok.bot/?utm_source=overbid', null, 'grok.bot',
+      'AI agents that run your site.', 125),
      ('url', 'https://outbid.lol', 'https://outbid.lol/?utm_source=overbid', null, 'outbid.lol',
       'No ads, no API keys, no revenue sharing. Just outbid your competition to get to the top.', 100)
    on conflict (identity_key) do nothing`,
+);
+
+// grok.bot leads the sites: same $1, but placed earliest so the tie-break ranks it first.
+await client.query(
+  `update listings
+     set updated_at = (select updated_at from listings where identity_key = 'https://outbid.lol') - interval '1 second'
+   where identity_key = 'https://grok.bot'`,
 );
 
 // Seed a little launch history for the live feed.
