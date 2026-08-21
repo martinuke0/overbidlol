@@ -42,7 +42,10 @@ export const metadata: Metadata = {
     title: "overbid.lol — the pay-to-rank leaderboard",
     description: DESC,
   },
-  verification: { google: "Upstw_YLQyfe035QAJfiEBe4uPc4x27TeCw3hGOo5AM" },
+  verification: {
+    google: "Upstw_YLQyfe035QAJfiEBe4uPc4x27TeCw3hGOo5AM",
+    other: { "ory-verify": "orynth-d7e7fd75bddd4302a872d2d087e665c0" },
+  },
 };
 
 export default function RootLayout({
