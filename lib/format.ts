@@ -30,7 +30,10 @@ export function displayName(row: Pick<BoardRow, "identity_kind" | "handle" | "ur
   }
 }
 
-export function faviconUrl(row: Pick<BoardRow, "identity_kind" | "url" | "identity_key">): string | null {
+export function faviconUrl(
+  row: Pick<BoardRow, "identity_kind" | "url" | "identity_key" | "favicon_url">,
+): string | null {
+  if (row.favicon_url) return row.favicon_url; // stored avatar (e.g. an X profile pic)
   if (row.identity_kind === "handle") return null;
   try {
     const host = new URL(row.url ?? row.identity_key).host;

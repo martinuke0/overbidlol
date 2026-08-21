@@ -34,12 +34,38 @@ await client.query(
    on conflict (identity_key) do nothing`,
 );
 
+// The owner, at the bottom of his own hate list — with his X avatar.
+await client.query(
+  `insert into listings (identity_kind, identity_key, url, handle, title, description, favicon_url, bid_cents)
+   values ('handle', '@martinuke0', 'https://x.com/martinuke0?utm_source=overbid', '@martinuke0', '',
+           'He built this whole thing.', '/avatars/martinuke0.png', 800)
+   on conflict (identity_key) do nothing`,
+);
+
 // grok.bot leads the sites: same $1, but placed earliest so the tie-break ranks it first.
 await client.query(
   `update listings
      set updated_at = (select updated_at from listings where identity_key = 'https://outbid.lol') - interval '1 second'
    where identity_key = 'https://grok.bot'`,
 );
+
+// Launch state: every hater starts at $1; @martinuke0 sits last (newest timestamp).
+const haterOrder = [
+  "@lewiscarhart",
+  "@jonathan_wilke",
+  "@realdonaldtrump",
+  "@sama",
+  "@elonmusk",
+  "@tibo_maker",
+  "@eugzolotarenko",
+  "@martinuke0",
+];
+for (let i = 0; i < haterOrder.length; i++) {
+  await client.query(
+    `update listings set bid_cents = 100, updated_at = now() - ($2 * interval '5 seconds') where identity_key = $1`,
+    [haterOrder[i], haterOrder.length - i],
+  );
+}
 
 // Seed a little launch history for the live feed.
 await client.query(
