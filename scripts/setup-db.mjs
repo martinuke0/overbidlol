@@ -5,6 +5,7 @@ import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
 import pg from "pg";
 import { importHaters } from "./admin/haters.mjs";
+import { importHaters2 } from "./admin/haters2.mjs";
 
 const here = dirname(fileURLToPath(import.meta.url));
 const schema = await readFile(join(here, "..", "schema.sql"), "utf8");
@@ -77,6 +78,8 @@ await client.query(
 
 // The full hater roster (@haters.md) at $1 with avatars + per-account share tweets.
 await importHaters(client);
+// haters2.md: outbid's paying customers — URLs batch + X handles batch, both $1.
+await importHaters2(client);
 
 
 const { rows } = await client.query(`select rank, title, bid_cents from board order by rank`);

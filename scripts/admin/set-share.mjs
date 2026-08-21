@@ -1,7 +1,7 @@
 // Set a listing's custom "share on X" tweet. URLs and @handles.
 // Empty string clears it (reverts to the default template).
 // Usage: set-share.mjs <url|@handle> <message...>
-//   node --env-file=.env.local scripts/admin/set-share.mjs @sama "@sama runs the AI. Someone unplug him 👇"
+//   node --env-file=.env.local scripts/admin/set-share.mjs @sama "@sama runs the AI. Someone unplug him ."
 import { withClient, normalize, findListing, showBoard } from "./_lib.mjs";
 
 const [target, ...rest] = process.argv.slice(2);
