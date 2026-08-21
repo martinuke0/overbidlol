@@ -78,10 +78,15 @@ export async function getAllBids(): Promise<{ identity_kind: "url" | "handle"; b
   return rows;
 }
 
-export async function getListingById(id: string): Promise<BoardRow | null> {
-  // uuid guard so a bad slug doesn't throw at the driver
-  if (!/^[0-9a-f-]{36}$/i.test(id)) return null;
-  const { rows } = await pool.query<BoardRow>(`select * from board where id = $1`, [id]);
+export async function getListingById(idOrSlug: string): Promise<BoardRow | null> {
+  // Accept a uuid (old /l/<id> links) or a personal slug (/roast/_skris, /roast/outrank.so).
+  if (/^[0-9a-f-]{36}$/i.test(idOrSlug)) {
+    const { rows } = await pool.query<BoardRow>(`select * from board where id = $1`, [idOrSlug]);
+    return rows[0] ?? null;
+  }
+  // A dot means a host (URL listing); otherwise it's an @handle name.
+  const key = idOrSlug.includes(".") ? `https://${idOrSlug.toLowerCase()}` : `@${idOrSlug.toLowerCase()}`;
+  const { rows } = await pool.query<BoardRow>(`select * from board where identity_key = $1`, [key]);
   return rows[0] ?? null;
 }
 

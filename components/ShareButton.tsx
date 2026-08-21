@@ -15,11 +15,13 @@ export function ShareButton({
 }) {
   function share(e: React.MouseEvent) {
     e.preventDefault();
-    const url = `${window.location.origin}/l/${id}`;
+    // Personal link: /roast/_skris or /roast/outrank.so (falls back to the id).
+    const slug = name.replace(/^@/, "").trim() || id;
+    const url = `${window.location.origin}/roast/${encodeURIComponent(slug)}`;
     const text =
       custom && custom.trim()
         ? custom
-        : `Hey ${name} — you're only #${rank} on overbid.lol 😤 Do something about it .`;
+        : `Hey ${name} — you're only #${rank} on overbid.lol 😤\n\nDo something about it.`;
     const intent = `https://twitter.com/intent/tweet?text=${encodeURIComponent(
       text,
     )}&url=${encodeURIComponent(url)}`;
