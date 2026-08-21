@@ -49,7 +49,7 @@ export function EditBio({ target }: { target: string }) {
         }}
         className="text-[11px] font-semibold text-muted-foreground underline decoration-dotted underline-offset-2 transition-colors hover:text-primary"
       >
-        ✎ edit bio
+        ✎ edit the hater
       </button>
     );
   }
