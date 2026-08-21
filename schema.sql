@@ -13,6 +13,7 @@ create table listings (
   title           text not null default '',
   description     text not null default '',
   favicon_url     text,
+  share_text      text, -- custom "share on X" tweet; null → default template (bought listings)
   bid_cents       integer not null check (bid_cents > 0),
   click_count     integer not null default 0,
   created_at      timestamptz not null default now(),

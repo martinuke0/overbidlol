@@ -20,6 +20,7 @@ export type BoardRow = {
   title: string;
   description: string;
   favicon_url: string | null;
+  share_text: string | null;
   bid_cents: number;
   click_count: number;
   created_at: string;

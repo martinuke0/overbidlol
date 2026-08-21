@@ -61,7 +61,7 @@ export function BoardRow({ row, now, rank }: { row: Row; now: number | null; ran
           {/* Above the stretched link so they're independently clickable. */}
           <div className="relative z-10 mt-1 flex flex-wrap items-center gap-x-4 gap-y-1">
             <EditBio target={editTarget} />
-            <ShareButton id={row.id} name={name} rank={rank} />
+            <ShareButton id={row.id} name={name} rank={rank} custom={row.share_text} />
           </div>
         </div>
 

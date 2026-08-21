@@ -26,6 +26,7 @@ Scripts read `DATABASE_URL` from the environment:
 | **remove** | `remove.mjs <url\|@handle>` |
 | **set-amount** | `set-amount.mjs <url\|@handle> <dollars>` |
 | **set-bio** | `set-bio.mjs <url\|@handle> <description…>` |
+| **set-share** | `set-share.mjs <url\|@handle> <tweet…>` (custom "share on X" text; empty → default) |
 
 `<dollars>` accepts decimals (`10.25`). Every command prints the resulting board.
 

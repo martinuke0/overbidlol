@@ -1,11 +1,25 @@
 "use client";
 
 // Opens an X (Twitter) compose window pre-filled with the listing's share link.
-export function ShareButton({ id, name, rank }: { id: string; name: string; rank: number }) {
+// `custom` = a per-account tweet; falls back to the default template (used by bought listings).
+export function ShareButton({
+  id,
+  name,
+  rank,
+  custom,
+}: {
+  id: string;
+  name: string;
+  rank: number;
+  custom?: string | null;
+}) {
   function share(e: React.MouseEvent) {
     e.preventDefault();
     const url = `${window.location.origin}/l/${id}`;
-    const text = `Should ${name} be #${rank} on overbid.lol? 😤\nOutbid them — or drag them down 👇`;
+    const text =
+      custom && custom.trim()
+        ? custom
+        : `Should ${name} be #${rank} on overbid.lol? 😤\nOutbid them — or drag them down 👇`;
     const intent = `https://twitter.com/intent/tweet?text=${encodeURIComponent(
       text,
     )}&url=${encodeURIComponent(url)}`;
