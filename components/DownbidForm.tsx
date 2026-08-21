@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { downbidPayCents, MIN_CENTS, STEP_CENTS } from "@/lib/bid";
 
 function GlobeIcon() {
@@ -23,9 +23,10 @@ const usd = (cents: number) => {
 
 export function DownbidForm({ defaultLowerCents }: { defaultLowerCents: number }) {
   // Default to the current top bid — enough to knock #1 off the board.
-  const [amount, setAmount] = useState(() =>
-    fmt(Math.max(MIN_CENTS, Math.round(defaultLowerCents / STEP_CENTS) * STEP_CENTS)),
-  );
+  const snapInit = (c: number) => Math.max(MIN_CENTS, Math.round(c / STEP_CENTS) * STEP_CENTS);
+  const [amount, setAmount] = useState(() => fmt(snapInit(defaultLowerCents)));
+  // Switching category resets the default target reduction to that category's top bid.
+  useEffect(() => setAmount(fmt(snapInit(defaultLowerCents))), [defaultLowerCents]);
   const [target, setTarget] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);

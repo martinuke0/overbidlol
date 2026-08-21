@@ -9,11 +9,18 @@ const TABS = [
   { key: "handle", label: "X" },
   { key: "all", label: "All" },
 ] as const;
-type Filter = (typeof TABS)[number]["key"];
+export type Filter = (typeof TABS)[number]["key"];
 
-export function Board({ initial }: { initial: Row[] }) {
+export function Board({
+  initial,
+  filter,
+  onFilter,
+}: {
+  initial: Row[];
+  filter: Filter;
+  onFilter: (f: Filter) => void;
+}) {
   const [rows, setRows] = useState(initial);
-  const [filter, setFilter] = useState<Filter>("handle");
   // null until mounted so SSR and first client render match (avoids time-drift hydration mismatch).
   const [now, setNow] = useState<number | null>(null);
   const [fetchedAt, setFetchedAt] = useState(() => Date.now());
@@ -68,7 +75,7 @@ export function Board({ initial }: { initial: Row[] }) {
         {TABS.map((t) => (
           <button
             key={t.key}
-            onClick={() => setFilter(t.key)}
+            onClick={() => onFilter(t.key)}
             className={`relative z-10 flex-1 rounded-full py-2 tracking-tight transition-colors duration-300 ${
               filter === t.key ? "text-background" : "text-muted-foreground hover:text-foreground"
             }`}

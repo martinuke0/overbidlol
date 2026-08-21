@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { MIN_CENTS, STEP_CENTS } from "@/lib/bid";
 
@@ -22,6 +22,8 @@ function GlobeIcon() {
 export function BidForm({ defaultCents, bids }: { defaultCents: number; bids: number[] }) {
   const router = useRouter();
   const [amount, setAmount] = useState(() => fmt(defaultCents)); // dollar string, e.g. "4" or "2.25"
+  // Switching category (slider tab) resets the suggested #1 price for that category.
+  useEffect(() => setAmount(fmt(defaultCents)), [defaultCents]);
   const [target, setTarget] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
