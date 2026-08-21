@@ -37,24 +37,25 @@ export function ActivityFeed() {
 
       <ol className="space-y-2 xl:max-h-[70vh] xl:overflow-auto">
         {events.map((e) => {
-          const down = e.kind === "downbid";
+          const icon = e.kind === "downbid" ? "▼" : e.kind === "edit" ? "✎" : "▲";
+          const color =
+            e.kind === "downbid"
+              ? "text-destructive"
+              : e.kind === "edit"
+                ? "text-muted-foreground"
+                : "text-primary";
+          const sign = e.kind === "downbid" ? "−" : e.kind === "edit" ? "" : "+";
           return (
             <li
               key={e.id}
               className="flex items-start gap-2.5 rounded-xl border border-primary/15 bg-primary/[0.03] px-3 py-2.5"
             >
-              <span
-                className={`mt-0.5 shrink-0 text-sm font-bold ${down ? "text-destructive" : "text-primary"}`}
-              >
-                {down ? "▼" : "▲"}
-              </span>
+              <span className={`mt-0.5 shrink-0 text-sm font-bold ${color}`}>{icon}</span>
               <div className="min-w-0 flex-1">
                 <div className="truncate text-sm font-semibold text-foreground">{e.label}</div>
-                <div className="text-xs text-muted-foreground">
-                  {e.note || (down ? "dragged down" : "overbid")}
-                </div>
+                <div className="text-xs text-muted-foreground">{e.note}</div>
                 <div className="mt-0.5 text-[11px] text-muted-foreground">
-                  {down ? "−" : "+"}
+                  {sign}
                   {usd(e.amount_cents)}
                   {now !== null && ` · ${timeAgo(e.created_at, now)}`}
                 </div>

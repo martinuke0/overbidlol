@@ -54,7 +54,7 @@ export async function insertIntent(row: {
   description: string;
   target_bid_cents: number;
   pay_cents: number;
-  action?: "overbid" | "downbid";
+  action?: "overbid" | "downbid" | "edit";
   lower_cents?: number | null;
 }): Promise<{ id: string }> {
   const { rows } = await pool.query<{ id: string }>(
@@ -132,7 +132,7 @@ export async function registerClick(id: string): Promise<string | null> {
 
 export type ActivityRow = {
   id: string;
-  kind: "overbid" | "downbid";
+  kind: "overbid" | "downbid" | "edit";
   label: string;
   amount_cents: number;
   note: string;
@@ -193,6 +193,25 @@ export async function runApply(
     }
     // Already applied or not payable → no-op (absorbs webhook retries).
     if (intent.polar_order_id === polarOrderId || intent.status !== "pending") {
+      await client.query("commit");
+      return;
+    }
+
+    if (intent.action === "edit") {
+      // Paid bio edit — apply the new description to the target listing.
+      await client.query(
+        `update listings set description = $2, updated_at = now() where identity_key = $1`,
+        [intent.identity_key, intent.description],
+      );
+      await client.query(
+        `insert into activity (kind, label, amount_cents, note) values ('edit', $1, $2, 'rewrote their bio')`,
+        [labelFor(intent), paidCents],
+      );
+      await client.query(
+        `update checkout_intents set status = 'paid', polar_order_id = $2, paid_at = now()
+         where id = $1 and status = 'pending'`,
+        [intentId, polarOrderId],
+      );
       await client.query("commit");
       return;
     }

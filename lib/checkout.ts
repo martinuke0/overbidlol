@@ -142,6 +142,56 @@ export async function createDownbid(opts: {
   return { url: checkout.url };
 }
 
+export const MAX_BIO = 100;
+
+/** Pay to rewrite a listing's description: 1¢/char, $0.50 min (processor floor), $1 max. */
+export async function createEditDescription(opts: {
+  body: { url?: string; handle?: string; description: string };
+  clientIp: string | undefined;
+}): Promise<{ url: string }> {
+  const appUrl = resolveAppUrl();
+
+  const identity = parseIdentity({
+    url: opts.body.url,
+    handle: opts.body.handle,
+    utmSource: process.env.NEXT_PUBLIC_UTM_SOURCE ?? "overbid",
+  });
+
+  const target = await findListingByKey(identity.key);
+  if (!target) throw new Error("That listing isn't on the board");
+
+  const description = (opts.body.description ?? "").trim().slice(0, MAX_BIO);
+  if (!description) throw new Error("Write something first");
+  const pay_cents = Math.min(MAX_BIO, Math.max(50, description.length)); // 1¢/char, 50¢ floor, $1 cap
+
+  const intent = await insertIntent({
+    listing_id: target.id,
+    identity_kind: identity.kind,
+    identity_key: identity.key,
+    url: identity.url,
+    handle: identity.handle,
+    title: "",
+    description,
+    target_bid_cents: MIN_CENTS, // satisfies the >=100 column; unused for edits
+    pay_cents,
+    action: "edit",
+    lower_cents: null,
+  });
+
+  const productId = process.env.POLAR_PRODUCT_ID!;
+  const checkout = await polar().checkouts.create({
+    products: [productId],
+    amount: pay_cents,
+    metadata: { intent_id: intent.id },
+    successUrl: `${appUrl}/success?checkout_id={CHECKOUT_ID}`,
+    allowDiscountCodes: false,
+    customerIpAddress: opts.clientIp,
+  });
+
+  await savePolarCheckoutId(intent.id, checkout.id);
+  return { url: checkout.url };
+}
+
 type OrderLike = {
   id: string;
   checkoutId?: string | null;

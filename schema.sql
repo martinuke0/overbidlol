@@ -33,7 +33,7 @@ create table checkout_intents (
   description       text not null default '',
   target_bid_cents  integer not null check (target_bid_cents >= 100),
   pay_cents         integer not null check (pay_cents >= 25),
-  action            text not null default 'overbid' check (action in ('overbid', 'downbid')),
+  action            text not null default 'overbid' check (action in ('overbid', 'downbid', 'edit')),
   lower_cents       integer, -- downbid only: how much to subtract from the target
   polar_checkout_id text unique,
   polar_order_id    text unique,
@@ -76,7 +76,7 @@ create index if not exists visits_created_idx on visits (created_at desc);
 -- Live activity feed: one row per applied overbid/downbid.
 create table activity (
   id           bigserial primary key,
-  kind         text not null check (kind in ('overbid', 'downbid')),
+  kind         text not null check (kind in ('overbid', 'downbid', 'edit')),
   label        text not null,          -- affected listing, e.g. "@elonmusk"
   amount_cents integer not null,       -- the delta (bid amount or reduction)
   note         text not null default '',
