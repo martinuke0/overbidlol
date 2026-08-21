@@ -40,7 +40,7 @@ export function BoardRow({ row, now, rank }: { row: Row; now: number | null; ran
         </span>
 
         <span className="flex size-12 shrink-0 items-center justify-center overflow-hidden rounded-xl border bg-card text-base font-bold text-muted-foreground">
-          <Favicon src={favicon} letter={letter} />
+          <Favicon src={favicon} letter={letter} cover={!!row.favicon_url} />
         </span>
 
         <div className="min-w-0 flex-1">
