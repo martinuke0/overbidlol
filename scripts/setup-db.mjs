@@ -20,6 +20,7 @@ await client.query(schema);
 await client.query(
   `insert into listings (identity_kind, identity_key, url, handle, title, description, bid_cents)
    values
+     ('handle', '@lewiscarhart', 'https://x.com/lewiscarhart?utm_source=overbid', '@lewiscarhart', '', 'lamborghini.lol ? LOL', 1025),
      ('handle', '@jonathan_wilke', 'https://x.com/jonathan_wilke?utm_source=overbid', '@jonathan_wilke', '', 'Very successful — he launched outbid.lol.', 1000),
      ('handle', '@realdonaldtrump', 'https://x.com/realDonaldTrump?utm_source=overbid', '@realDonaldTrump', '', 'He is the president.', 975),
      ('handle', '@sama', 'https://x.com/sama?utm_source=overbid', '@sama', '', 'He is evil.', 950),
